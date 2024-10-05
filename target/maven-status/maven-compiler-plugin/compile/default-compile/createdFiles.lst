@@ -1,0 +1,9 @@
+fiap\com\model\Transacao.class
+fiap\com\model\HistoricoPrecoAtivo.class
+fiap\com\repository\JdbcHelper.class
+fiap\com\Main.class
+fiap\com\model\Conta.class
+fiap\com\model\Transacao$TipoTransacao.class
+fiap\com\model\Ativo.class
+fiap\com\services\UserService.class
+fiap\com\model\Carteira.class
