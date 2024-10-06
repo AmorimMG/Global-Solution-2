@@ -1,5 +1,7 @@
 package fiap.com.model;
 
+import fiap.com.repository.TransacaoDAO;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -22,5 +24,10 @@ public record Transacao(
     public enum TipoTransacao {
         COMPRA,
         VENDA
+    }
+
+    public void salvar() {
+        TransacaoDAO dao = TransacaoDAO.getInstance();
+        dao.inserir(this);
     }
 }

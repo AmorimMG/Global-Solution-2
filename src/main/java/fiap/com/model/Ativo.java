@@ -1,5 +1,7 @@
 package fiap.com.model;
 
+import fiap.com.repository.AtivoDAO;
+
 import java.math.BigDecimal;
 
 public class Ativo {
@@ -30,12 +32,11 @@ public class Ativo {
             throw new IllegalArgumentException("O valor de um ativo não pode ser negativo!");
         }
 
-        // TODO db
-
         this.valorAtivo = valorAtivo;
+        this.salvar();
 
         HistoricoPrecoAtivo h = HistoricoPrecoAtivo.fromAtivo(this);
-        // TODO - db add to history table
+        h.salvar();
         return h;
     }
 
@@ -58,5 +59,10 @@ public class Ativo {
                 ", nomeAtivo='" + nomeAtivo + '\'' +
                 ", valorAtivo=" + valorAtivo +
                 '}';
+    }
+
+    private void salvar() {
+        AtivoDAO dao = AtivoDAO.getInstance();
+        dao.salvar(this);
     }
 }

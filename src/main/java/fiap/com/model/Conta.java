@@ -22,6 +22,16 @@ public class Conta {
         this.senha = senha;
     }
 
+    public Conta(String cpf, String nome, String email, Date dataNascimento, String login, String senha, BigDecimal saldo) {
+        this.cpf = cpf;
+        this.nome = nome;
+        this.email = email;
+        this.dataNascimento = dataNascimento;
+        this.login = login;
+        this.senha = senha;
+        this.saldo = saldo;
+    }
+
     public String getLogin() {
         return login;
     }
@@ -51,33 +61,39 @@ public class Conta {
     }
 
     public BigDecimal depositar(BigDecimal deposito) {
-        // TODO db
-
         if (deposito.compareTo(BigDecimal.ZERO) < 0) {
             throw new IllegalArgumentException("O valor do depósito deve ser positivo!");
         }
 
         saldo = saldo.add(deposito);
+        this.salvar();
         return saldo;
     }
 
     public BigDecimal sacar(BigDecimal saque) {
-        // TODO db
-
         if (saque.compareTo(BigDecimal.ZERO) < 0 || saque.compareTo(saldo) > 0) {
             throw new IllegalArgumentException("Valor inválido de saque!");
         }
 
         saldo = saldo.subtract(saque);
+        this.salvar();
         return saldo;
     }
 
     @Override
     public String toString() {
         return "Conta{" +
+                "cpf='" + cpf + '\'' +
+                ", nome='" + nome + '\'' +
+                ", email='" + email + '\'' +
+                ", dataNascimento=" + dataNascimento +
                 ", login='" + login + '\'' +
                 ", senha='" + senha + '\'' +
                 ", saldo=" + saldo +
                 '}';
+    }
+
+    private void salvar() {
+        // TODO
     }
 }

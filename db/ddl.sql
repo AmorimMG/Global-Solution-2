@@ -17,6 +17,9 @@ CREATE TABLE Conta (
                        CHECK (saldo >= 0)                   -- Saldo não pode ser negativo
 );
 
+ALTER TABLE Conta
+ADD CONSTRAINT unique_login UNIQUE (login);
+
 -- Tabela Carteira (associação Many-to-Many entre Conta e Ativo)
 CREATE TABLE Carteira (
                           cpf VARCHAR(11),                      -- Chave estrangeira para Conta
