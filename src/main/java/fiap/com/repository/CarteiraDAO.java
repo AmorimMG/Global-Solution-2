@@ -29,8 +29,28 @@ public class CarteiraDAO {
     public boolean salvar(String cpf, String codigo, BigDecimal quantidade, boolean novo) {
         if (novo) {
             return inserir(cpf, codigo, quantidade);
+        } else if (quantidade.equals(BigDecimal.ZERO)){
+            return deletar(cpf, codigo);
         } else {
             return atualizar(cpf, codigo, quantidade);
+        }
+    }
+
+    private boolean deletar(String cpf, String codigo) {
+        String sql = "DELETE FROM CARTEIRA WHERE CPF=? AND CODIGO_ATIVO=?";
+        try (Connection connection = jdbcHelper.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)){
+
+            statement.setString(1, cpf);
+            statement.setString(2, codigo);
+
+            statement.executeUpdate();
+
+            connection.commit();
+            return true;
+        } catch (SQLException e) {
+            System.out.println("Erro ao deletar ativo da carteira no banco de dados:" + e.getMessage());
+            return false;
         }
     }
 
@@ -79,7 +99,7 @@ public class CarteiraDAO {
             statement.setString(2, codigoAtivo);
 
             ResultSet rs = statement.executeQuery();
-            BigDecimal bigDecimal = null;
+            BigDecimal bigDecimal;
 
             if (rs.next()) {
                 bigDecimal = rs.getBigDecimal("QUANTIDADE");
@@ -101,7 +121,6 @@ public class CarteiraDAO {
             statement.setString(1, conta.getCpf());
 
             ResultSet rs = statement.executeQuery();
-            BigDecimal bigDecimal = null;
 
             Map<String, BigDecimal> map = new HashMap<>();
             while (rs.next()) {

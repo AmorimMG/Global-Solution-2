@@ -1,5 +1,7 @@
 package fiap.com.model;
 
+import fiap.com.repository.ContaDAO;
+
 import java.math.BigDecimal;
 import java.util.Date;
 
@@ -94,6 +96,7 @@ public class Conta {
     }
 
     private void salvar() {
-        // TODO
+        ContaDAO dao = ContaDAO.getInstance();
+        dao.salvar(this);
     }
 }

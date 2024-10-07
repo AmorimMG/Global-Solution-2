@@ -1,8 +1,6 @@
 package fiap.com.repository;
 
 import fiap.com.model.Ativo;
-import fiap.com.model.Conta;
-import fiap.com.util.DateUtil;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
@@ -55,7 +53,7 @@ public class AtivoDAO{
             statement.setString(1, codigo);
 
             ResultSet rs = statement.executeQuery();
-            Ativo ativo = null;
+            Ativo ativo;
             if (rs.next()) {
                 ativo = new Ativo(
                         rs.getString("CODIGO_ATIVO"),
@@ -114,5 +112,20 @@ public class AtivoDAO{
         }
     }
 
-    // TODO delete
+    public boolean deletar(Ativo ativo) {
+        String sql = "DELETE FROM ATIVO a WHERE a.CODIGO_ATIVO=?";
+        try (Connection connection = jdbcHelper.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)){
+
+            statement.setString(1, ativo.getCodigoAtivo());
+
+            statement.executeUpdate();
+
+            connection.commit();
+            return true;
+        } catch (SQLException e) {
+            System.out.println("Erro ao deletar ativo no banco de dados:" + e.getMessage());
+            return false;
+        }
+    }
 }

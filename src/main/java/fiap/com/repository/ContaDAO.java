@@ -55,7 +55,7 @@ public class ContaDAO {
             statement.setString(1, cpf);
 
             ResultSet rs = statement.executeQuery();
-            Conta conta = null;
+            Conta conta;
             if (rs.next()) {
                 conta = new Conta(
                         rs.getString("CPF"),
@@ -102,6 +102,29 @@ public class ContaDAO {
         } catch (Exception e) {
             System.out.println("Erro ao buscar conta no banco de dados:" + e.getMessage());
             return Optional.empty();
+        }
+    }
+
+    public boolean salvar(Conta conta) {
+        String sql = "UPDATE CONTA c set c.SALDO=?, c.LOGIN=?, c.SENHA=?, c.NOME=?, c.DATA_NASCIMENTO=?, c.EMAIL=? WHERE c.CPF=?";
+        try (Connection connection = jdbcHelper.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)){
+
+            statement.setBigDecimal(1, conta.getSaldo());
+            statement.setString(2, conta.getLogin());
+            statement.setString(3, conta.getSenha());
+            statement.setString(4, conta.getNome());
+            statement.setDate(5, DateUtil.sqlDateFromJavaDate(conta.getDataNascimento()));
+            statement.setString(6, conta.getEmail());
+            statement.setString(7, conta.getCpf());
+
+            statement.executeUpdate();
+
+            connection.commit();
+            return true;
+        } catch (SQLException e) {
+            System.out.println("Erro ao salvar conta no banco de dados:" + e.getMessage());
+            return false;
         }
     }
 }
