@@ -29,7 +29,7 @@ public class CarteiraDAO {
     public boolean salvar(String cpf, String codigo, BigDecimal quantidade, boolean novo) {
         if (novo) {
             return inserir(cpf, codigo, quantidade);
-        } else if (quantidade.equals(BigDecimal.ZERO)){
+        } else if (quantidade.compareTo(BigDecimal.ZERO) == 0) {
             return deletar(cpf, codigo);
         } else {
             return atualizar(cpf, codigo, quantidade);
@@ -39,7 +39,7 @@ public class CarteiraDAO {
     private boolean deletar(String cpf, String codigo) {
         String sql = "DELETE FROM CARTEIRA WHERE CPF=? AND CODIGO_ATIVO=?";
         try (Connection connection = jdbcHelper.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)){
+             PreparedStatement statement = connection.prepareStatement(sql)) {
 
             statement.setString(1, cpf);
             statement.setString(2, codigo);
@@ -57,7 +57,7 @@ public class CarteiraDAO {
     private boolean atualizar(String cpf, String codigo, BigDecimal quantidade) {
         String sql = "UPDATE CARTEIRA SET QUANTIDADE=? WHERE CPF=? AND CODIGO_ATIVO=?";
         try (Connection connection = jdbcHelper.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)){
+             PreparedStatement statement = connection.prepareStatement(sql)) {
 
             statement.setBigDecimal(1, quantidade);
             statement.setString(2, cpf);
@@ -75,12 +75,12 @@ public class CarteiraDAO {
     private boolean inserir(String cpf, String codigo, BigDecimal quantidade) {
         String sql = "INSERT INTO CARTEIRA (CPF, CODIGO_ATIVO, QUANTIDADE) VALUES (?, ?, ?)";
         try (Connection connection = jdbcHelper.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)){
+             PreparedStatement statement = connection.prepareStatement(sql)) {
 
             statement.setString(1, cpf);
             statement.setString(2, codigo);
             statement.setBigDecimal(3, quantidade);
-            
+
             statement.executeUpdate();
             connection.commit();
             return true;
@@ -93,7 +93,7 @@ public class CarteiraDAO {
     public Optional<BigDecimal> buscarPorCpfCodigo(String cpf, String codigoAtivo) {
         String sql = "SELECT QUANTIDADE FROM CARTEIRA c WHERE c.CPF=? AND c.CODIGO_ATIVO=?";
         try (Connection connection = jdbcHelper.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)){
+             PreparedStatement statement = connection.prepareStatement(sql)) {
 
             statement.setString(1, cpf);
             statement.setString(2, codigoAtivo);
@@ -116,7 +116,7 @@ public class CarteiraDAO {
     public Map<String, BigDecimal> buscarCarteira(Conta conta) {
         String sql = "SELECT CODIGO_ATIVO, QUANTIDADE FROM CARTEIRA c WHERE c.CPF=?";
         try (Connection connection = jdbcHelper.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)){
+             PreparedStatement statement = connection.prepareStatement(sql)) {
 
             statement.setString(1, conta.getCpf());
 

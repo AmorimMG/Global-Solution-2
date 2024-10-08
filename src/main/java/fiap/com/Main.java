@@ -1,5 +1,6 @@
 package fiap.com;
 
+import fiap.com.application.menu.Menu;
 import fiap.com.exception.UnauthorizedException;
 import fiap.com.model.*;
 import fiap.com.repository.JdbcHelper;
@@ -8,16 +9,20 @@ import fiap.com.util.DateUtil;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.sql.SQLOutput;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
+
 public class Main {
     public static void main(String[] args) throws UnauthorizedException {
-        endToEnd();
+        /*
+          Des-comente a linha abaixo para rodar a simulação end to end da aplicação. Saiba que ela vai apagar
+          o banco de dados ao início e ao fim.
+          */
+        // endToEnd();
+
+        Menu menu = new Menu();
+        menu.execute();
     }
 
     /**
@@ -27,8 +32,8 @@ public class Main {
      * completo da aplicação
      * <p>
      * Ao fim, reiniciamos novamente o banco de dados
-     * */
-    private static void endToEnd() throws UnauthorizedException {
+     */
+    private static void endToEnd() throws Exception {
         JdbcHelper jdbcHelper = JdbcHelper.getInstance();
         jdbcHelper.resetDb();
 
@@ -60,9 +65,14 @@ public class Main {
         // ------- Instanciação dos ativos ------ //
         System.out.println("\n=================\n");
 
-        ativoService.criar("BTC", "Bitcon", new BigDecimal("1000"));
-        ativoService.criar("ETH", "Ethereum", new BigDecimal("400"));
-        ativoService.criar("BNB", "Binance coin", new BigDecimal("600"));
+        try {
+            ativoService.criar("BTC", "Bitcon", new BigDecimal("1000"));
+            ativoService.criar("ETH", "Ethereum", new BigDecimal("400"));
+            ativoService.criar("BNB", "Binance coin", new BigDecimal("600"));
+        } catch (Exception e) {
+            System.out.println("Erro ao cadastrar ativos");
+            return;
+        }
 
         List<Ativo> ativos = ativoService.listarAtivos();
         System.out.println("Ativos no banco de dados: ");
@@ -92,9 +102,7 @@ public class Main {
         System.out.println("Saldo da conta após depósito: " + conta.getSaldo());
 
         Optional<Conta> contaFromDB = contaService.buscarPorCpf(conta.getCpf());
-        contaFromDB.ifPresent((c) -> {
-            System.out.println("Dados da conta no banco de dados: "+ c);
-        });
+        contaFromDB.ifPresent((c) -> System.out.println("Dados da conta no banco de dados: " + c));
 
         // ------- Compra de ativos ------ //
         System.out.println("\n=================\n");
@@ -123,10 +131,11 @@ public class Main {
 
         // Vamos vender metade do bitcoin e liquidar o resto
         Optional<BigDecimal> quantidadeDeBtcNaCarteira = carteira.getAtivo(btc);
-         quantidadeDeBtcNaCarteira.ifPresent(qtd -> {
+        if (quantidadeDeBtcNaCarteira.isPresent()) {
+            BigDecimal qtd = quantidadeDeBtcNaCarteira.get();
             BigDecimal res = carteira.vender(btc, qtd.divide(BigDecimal.valueOf(2), 2, RoundingMode.HALF_UP));
             System.out.println("Lucro com a venda do BTC: " + res);
-         });
+        }
 
         BigDecimal res = carteira.liquidar(eth);
         System.out.println("Lucro com a venda do ETH: " + res);

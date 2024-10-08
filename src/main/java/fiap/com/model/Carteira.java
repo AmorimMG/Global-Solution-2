@@ -4,12 +4,14 @@ import fiap.com.repository.CarteiraDAO;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * Classe utilitária para facilitar a manipulação das linhas da tabela Carteira.
  * Representa uma relação many to many onde cada par cpd-codigo moeda forma uma linha
- * */
+ */
 public class Carteira { // Many to Many com Conta e Ativo, usarei uma PK composta
     private final Conta conta;
     private final Map<String, BigDecimal> carteira = new HashMap<>();
@@ -24,12 +26,12 @@ public class Carteira { // Many to Many com Conta e Ativo, usarei uma PK compost
 
     /**
      * Metodo para comprar um ativo
+     *
      * @param ativo para ser comprado
      * @param reais quantos reais devem ser depositados do ativo especificado
-     *
      * @return a nova quantidade do ativo
-     * */
-    public BigDecimal comprar(Ativo ativo, BigDecimal reais) {
+     */
+    public BigDecimal comprar(Ativo ativo, BigDecimal reais) throws Exception {
         Optional<BigDecimal> optional = getAtivo(ativo);
         boolean novo = optional.isEmpty();
         BigDecimal valorNaCarteira = optional.orElse(BigDecimal.ZERO);
@@ -50,31 +52,31 @@ public class Carteira { // Many to Many com Conta e Ativo, usarei uma PK compost
 
     /**
      * Metodo para comprar um ativo
-     * @param ativo para ser vendido
-     * @param ativos quantos ativos devem ser vendidos
      *
+     * @param ativo  para ser vendido
+     * @param ativos quantos ativos devem ser vendidos
      * @return o valor da venda em reais
-     * */
-    public BigDecimal vender(Ativo ativo, BigDecimal ativos) {
+     */
+    public BigDecimal vender(Ativo ativo, BigDecimal ativos) throws Exception {
         Optional<BigDecimal> optional = getAtivo(ativo);
         if (optional.isEmpty()) {
-            throw new IllegalArgumentException("Você não possui esse ativo!");
+            throw new Exception("Você não possui esse ativo!");
         }
 
         BigDecimal valorNaCarteira = optional.get();
 
         if (ativos.compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException("Você não pode vender uma quantidade negativa de ativos");
+            throw new Exception("Você não pode vender uma quantidade negativa de ativos");
         }
 
         if (ativos.compareTo(valorNaCarteira) > 0) {
-            throw new IllegalArgumentException("Você está tentando vender mais ativos do que possui!");
+            throw new Exception("Você está tentando vender mais ativos do que possui!");
         }
-
-        carteira.put(ativo.getCodigoAtivo(), valorNaCarteira.subtract(ativos));
 
         BigDecimal valorDaVenda = ativos.multiply(ativo.getValorAtivo()).setScale(2, RoundingMode.HALF_UP);
         conta.depositar(valorDaVenda);
+
+        carteira.put(ativo.getCodigoAtivo(), valorNaCarteira.subtract(ativos));
 
         salvar(ativo, false);
 
@@ -86,11 +88,11 @@ public class Carteira { // Many to Many com Conta e Ativo, usarei uma PK compost
 
     /**
      * Vende todos os ativos de um tipo
-     * @param ativo - para ser vendido
      *
+     * @param ativo - para ser vendido
      * @return o valor da venda em reais
-     * */
-    public BigDecimal liquidar(Ativo ativo) {
+     */
+    public BigDecimal liquidar(Ativo ativo) throws Exception {
         Optional<BigDecimal> optional = getAtivo(ativo);
 
         BigDecimal valorNaCarteira = optional.orElse(BigDecimal.ZERO).setScale(2, RoundingMode.HALF_UP);
@@ -106,9 +108,7 @@ public class Carteira { // Many to Many com Conta e Ativo, usarei uma PK compost
 
         CarteiraDAO carteiraDAO = CarteiraDAO.getInstance();
         Optional<BigDecimal> res = carteiraDAO.buscarPorCpfCodigo(this.conta.getCpf(), ativo.getCodigoAtivo());
-        res.ifPresent((v) -> {
-            carteira.put(ativo.getCodigoAtivo(), v.setScale(2, RoundingMode.HALF_UP));
-        });
+        res.ifPresent((v) -> carteira.put(ativo.getCodigoAtivo(), v.setScale(2, RoundingMode.HALF_UP)));
 
         return res;
     }

@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class AtivoDAO{
+public class AtivoDAO {
     private static AtivoDAO instance = null;
     private final JdbcHelper jdbcHelper;
 
@@ -29,7 +29,7 @@ public class AtivoDAO{
     public boolean criar(Ativo ativo) {
         String sql = "INSERT INTO ATIVO (CODIGO_ATIVO, NOME_ATIVO, VALOR_ATIVO)  VALUES (?, ?, ?)";
         try (Connection connection = jdbcHelper.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)){
+             PreparedStatement statement = connection.prepareStatement(sql)) {
 
             statement.setString(1, ativo.getCodigoAtivo());
             statement.setString(2, ativo.getNomeAtivo());
@@ -48,7 +48,7 @@ public class AtivoDAO{
     public Optional<Ativo> acharPorCodigo(String codigo) {
         String sql = "SELECT CODIGO_ATIVO, NOME_ATIVO, VALOR_ATIVO FROM ATIVO a WHERE a.CODIGO_ATIVO = ?";
         try (Connection connection = jdbcHelper.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)){
+             PreparedStatement statement = connection.prepareStatement(sql)) {
 
             statement.setString(1, codigo);
 
@@ -74,7 +74,7 @@ public class AtivoDAO{
     public List<Ativo> listarAtivos() {
         String sql = "SELECT * FROM ATIVO";
         try (Connection connection = jdbcHelper.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)){
+             PreparedStatement statement = connection.prepareStatement(sql)) {
 
             ResultSet rs = statement.executeQuery();
             List<Ativo> ativos = new ArrayList<>();
@@ -96,7 +96,7 @@ public class AtivoDAO{
     public boolean salvar(Ativo ativo) {
         String sql = "UPDATE ATIVO a set a.VALOR_ATIVO=?, a.NOME_ATIVO=? WHERE a.CODIGO_ATIVO=?";
         try (Connection connection = jdbcHelper.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)){
+             PreparedStatement statement = connection.prepareStatement(sql)) {
 
             statement.setBigDecimal(1, ativo.getValorAtivo());
             statement.setString(2, ativo.getNomeAtivo());
@@ -112,12 +112,12 @@ public class AtivoDAO{
         }
     }
 
-    public boolean deletar(Ativo ativo) {
+    public boolean deletar(String codigo) {
         String sql = "DELETE FROM ATIVO a WHERE a.CODIGO_ATIVO=?";
         try (Connection connection = jdbcHelper.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)){
+             PreparedStatement statement = connection.prepareStatement(sql)) {
 
-            statement.setString(1, ativo.getCodigoAtivo());
+            statement.setString(1, codigo);
 
             statement.executeUpdate();
 

@@ -1,6 +1,5 @@
 package fiap.com.services;
 
-import fiap.com.exception.UnauthorizedException;
 import fiap.com.model.Ativo;
 import fiap.com.model.Carteira;
 import fiap.com.model.Conta;
@@ -22,7 +21,7 @@ public class CarteiraService {
         return instance;
     }
 
-    private CarteiraService(){
+    private CarteiraService() {
         carteiraDAO = CarteiraDAO.getInstance();
     }
 
@@ -32,12 +31,10 @@ public class CarteiraService {
 
     public void exibirCarteira(Conta conta) {
         Map<String, BigDecimal> carteira = buscarCarteira(conta);
-        carteira.forEach((k, v) -> {
-            System.out.println(k + " - " + v);
-        });
+        carteira.forEach((k, v) -> System.out.println(k + " - " + v));
     }
 
-    public static void main(String[] args) throws UnauthorizedException {
+    public static void main(String[] args) throws Exception {
         ContaService contaService = ContaService.getInstance();
         AtivoService ativoService = AtivoService.getInstance();
         CarteiraService carteiraService = CarteiraService.getInstance();
@@ -52,11 +49,11 @@ public class CarteiraService {
 
         System.out.println("Saldo inicial na conta: " + conta.getSaldo());
 
-        ativos.forEach((ativo -> {
-            System.out.println("Comprando ativo [" + ativo.getCodigoAtivo() + "] para o usuário [" + conta.getLogin() + "]");
-            carteira.comprar(ativo, new BigDecimal("1000"));
+        for (Ativo ativo2 : ativos) {
+            System.out.println("Comprando ativo [" + ativo2.getCodigoAtivo() + "] para o usuário [" + conta.getLogin() + "]");
+            carteira.comprar(ativo2, new BigDecimal("1000"));
             System.out.println("Novo saldo: " + conta.getSaldo());
-        }));
+        }
 
         System.out.println("Saldo na conta após compras: " + conta.getSaldo());
 
@@ -67,25 +64,21 @@ public class CarteiraService {
         System.out.println("\n-------------------------\n");
 
         // Vamos dobras o valor de todos os ativos para simulação
-        ativos.forEach(ativo -> {
-            ativo.aumentarValor(ativo.getValorAtivo());
-        });
+        ativos.forEach(ativo -> ativo.aumentarValor(ativo.getValorAtivo()));
 
         System.out.println("Liquidando todos os ativos");
-        ativos.forEach(ativo -> {
-            System.out.println("Liquidando ativo [" + ativo.getCodigoAtivo() + "] para o usuário + [" + conta.getLogin() + "]");
-            BigDecimal venda = carteira.liquidar(ativo);
+        for (Ativo ativo1 : ativos) {
+            System.out.println("Liquidando ativo [" + ativo1.getCodigoAtivo() + "] para o usuário + [" + conta.getLogin() + "]");
+            BigDecimal venda = carteira.liquidar(ativo1);
             System.out.println("Valor da venda: " + venda);
             System.out.println("Novo saldo: " + conta.getSaldo());
 
-        });
+        }
 
         System.out.println("Saldo na conta após vendas: " + conta.getSaldo());
 
         // Vamos resetar o valor dos ativos após a simulação
-        ativos.forEach(ativo -> {
-            ativo.diminuirValor(ativo.getValorAtivo().divide(new BigDecimal("2"), 5, RoundingMode.HALF_UP));
-        });
+        ativos.forEach(ativo -> ativo.diminuirValor(ativo.getValorAtivo().divide(new BigDecimal("2"), 5, RoundingMode.HALF_UP)));
 
         System.out.println("\n-------------------------\n");
 

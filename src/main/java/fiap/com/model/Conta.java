@@ -62,9 +62,9 @@ public class Conta {
         return dataNascimento;
     }
 
-    public BigDecimal depositar(BigDecimal deposito) {
+    public BigDecimal depositar(BigDecimal deposito) throws Exception {
         if (deposito.compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException("O valor do depósito deve ser positivo!");
+            throw new Exception("O valor do depósito deve ser positivo!");
         }
 
         saldo = saldo.add(deposito);
@@ -72,9 +72,9 @@ public class Conta {
         return saldo;
     }
 
-    public BigDecimal sacar(BigDecimal saque) {
+    public BigDecimal sacar(BigDecimal saque) throws Exception {
         if (saque.compareTo(BigDecimal.ZERO) < 0 || saque.compareTo(saldo) > 0) {
-            throw new IllegalArgumentException("Valor inválido de saque!");
+            throw new Exception("Valor inválido de saque!");
         }
 
         saldo = saldo.subtract(saque);

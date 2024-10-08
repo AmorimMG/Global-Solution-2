@@ -24,15 +24,15 @@ public class AtivoService {
     }
 
     private AtivoService() {
-        ativoDAO =  AtivoDAO.getInstance();
+        ativoDAO = AtivoDAO.getInstance();
     }
 
-    public Ativo criar(String codigo, String nome, BigDecimal preco) {
+    public Ativo criar(String codigo, String nome, BigDecimal preco) throws Exception {
         Ativo ativo = new Ativo(codigo, nome, preco);
         boolean success = ativoDAO.criar(ativo);
 
         if (!success) {
-            System.out.println("Erro ao criar ativo...");
+            throw new Exception("Erro ao criar ativo...");
         }
 
         HistoricoPrecoAtivo h = HistoricoPrecoAtivo.fromAtivo(ativo);
@@ -41,7 +41,7 @@ public class AtivoService {
         return ativo;
     }
 
-    public List<Ativo> listarAtivos(){
+    public List<Ativo> listarAtivos() {
         return ativoDAO.listarAtivos();
     }
 
@@ -57,16 +57,8 @@ public class AtivoService {
 
         Optional<Ativo> db = acharPorCodigo(codigo);
         db.ifPresentOrElse(
-                (ativo -> {
-                    cache.put(ativo.getCodigoAtivo(), ativo);
-                }),
-                () -> {
-                    System.out.println("Ativo com código [" + codigo + "] não encontrado. Aqui estão os ativos cadastrados:");
-                    var ativos = listarAtivos();
-                    for (int i = 0; i < ativos.size(); i++) {
-                        System.out.println(String.valueOf(i + 1 + " - " + ativos.get(i).getCodigoAtivo()));
-                    }
-                }
+                (ativo -> cache.put(ativo.getCodigoAtivo(), ativo)),
+                () -> System.out.println("Ativo com código [" + codigo + "] não encontrado")
         );
 
         return db;
@@ -76,11 +68,15 @@ public class AtivoService {
     public static void main(String[] args) {
         AtivoService a = AtivoService.getInstance();
 
-        System.out.println("Criando ativo BitCoin");
-        a.criar("BTC", "BitCoin", new BigDecimal("1000"));
+        try {
+            System.out.println("Criando ativo BitCoin");
+            a.criar("BTC", "BitCoin", new BigDecimal("1000"));
 
-        System.out.println("Criando ativo Ethereum");
-        a.criar("ETH", "Ethereum", new BigDecimal("500"));
+            System.out.println("Criando ativo Ethereum");
+            a.criar("ETH", "Ethereum", new BigDecimal("500"));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
 
         System.out.println("Procurando BTC");
         Optional<Ativo> res = a.getAtivo("BTC");
@@ -97,5 +93,12 @@ public class AtivoService {
         System.out.println("Procurando TODOS");
         List<?> ativos = a.listarAtivos();
         System.out.println("Resultado:" + ativos);
+    }
+
+    public void deletarAtivo(String codigo) {
+        boolean success = ativoDAO.deletar(codigo);
+        if (!success) {
+            System.out.println("Erro ao deletar ativo");
+        }
     }
 }
