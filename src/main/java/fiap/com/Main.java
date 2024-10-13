@@ -1,7 +1,6 @@
 package fiap.com;
 
 import fiap.com.application.menu.Menu;
-import fiap.com.exception.UnauthorizedException;
 import fiap.com.model.*;
 import fiap.com.repository.JdbcHelper;
 import fiap.com.services.*;
@@ -14,12 +13,12 @@ import java.util.Optional;
 
 
 public class Main {
-    public static void main(String[] args) throws UnauthorizedException {
+    public static void main(String[] args) throws Exception {
         /*
           Des-comente a linha abaixo para rodar a simulação end to end da aplicação. Saiba que ela vai apagar
           o banco de dados ao início e ao fim.
           */
-        // endToEnd();
+//        endToEnd();
 
         Menu menu = new Menu();
         menu.execute();

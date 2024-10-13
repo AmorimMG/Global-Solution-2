@@ -1,70 +1,61 @@
 -- Tabela Ativo
 CREATE TABLE Ativo (
-                       codigo_ativo VARCHAR(10) PRIMARY KEY,  -- Código do ativo como chave primária
-                       nome_ativo VARCHAR(255) NOT NULL,      -- Nome do ativo, campo não nulo
-                       valor_ativo DECIMAL(18, 5) NOT NULL      -- Valor do ativo, não pode ser negativo
+                       codigo_ativo VARCHAR2(10) PRIMARY KEY,
+                       nome_ativo VARCHAR2(255) NOT NULL,
+                       valor_ativo NUMBER(18, 5) NOT NULL
 );
 
 -- Tabela Conta
 CREATE TABLE Conta (
-                       cpf VARCHAR(11) PRIMARY KEY,         -- CPF como chave primária
-                       nome VARCHAR(255) NOT NULL,          -- Nome do usuário, campo não nulo
-                       email VARCHAR(255) NOT NULL,         -- Email não nulo
-                       data_nascimento DATE NOT NULL,       -- Data de nascimento, campo não nulo
-                       login VARCHAR(50) NOT NULL,          -- Login do usuário, campo não nulo
-                       senha VARCHAR(255) NOT NULL,         -- Senha do usuário, campo não nulo
-                       saldo DECIMAL(18, 2) DEFAULT 0,      -- Saldo da conta
-                       CHECK (saldo >= 0)                   -- Saldo não pode ser negativo
+                       cpf VARCHAR2(11) PRIMARY KEY,
+                       nome VARCHAR2(255) NOT NULL,
+                       email VARCHAR2(255) NOT NULL,
+                       data_nascimento DATE NOT NULL,
+                       login VARCHAR2(50) NOT NULL,
+                       senha VARCHAR2(255) NOT NULL,
+                       saldo NUMBER(18, 2) DEFAULT 0 CHECK (saldo >= 0)
 );
 
-ALTER TABLE Conta
-ADD CONSTRAINT unique_login UNIQUE (login);
+-- Constraint UNIQUE na tabela Conta para o login
+ALTER TABLE Conta ADD CONSTRAINT unique_login UNIQUE (login);
 
 -- Tabela Carteira (associação Many-to-Many entre Conta e Ativo)
 CREATE TABLE Carteira (
-                          cpf VARCHAR(11),                      -- Chave estrangeira para Conta
-                          codigo_ativo VARCHAR(10),             -- Chave estrangeira para Ativo
-                          quantidade DECIMAL(18, 5) NOT NULL,   -- Quantidade de ativos na carteira
-                          PRIMARY KEY (cpf, codigo_ativo)       -- Chave primária composta
+                          cpf VARCHAR2(11),
+                          codigo_ativo VARCHAR2(10),
+                          quantidade NUMBER(18, 5) NOT NULL,
+                          PRIMARY KEY (cpf, codigo_ativo)
 );
 
--- Constraints da tabela Carteira
-ALTER TABLE Carteira
-    ADD CONSTRAINT fk_carteira_conta
-        FOREIGN KEY (cpf) REFERENCES Conta(cpf) ON DELETE CASCADE;
+-- Constraint Foreign Key para associar Carteira com Conta (cpf)
+ALTER TABLE Carteira ADD CONSTRAINT fk_carteira_conta FOREIGN KEY (cpf) REFERENCES Conta(cpf) ON DELETE CASCADE;
 
-ALTER TABLE Carteira
-    ADD CONSTRAINT fk_carteira_ativo
-        FOREIGN KEY (codigo_ativo) REFERENCES Ativo(codigo_ativo) ON DELETE CASCADE;
+-- Constraint Foreign Key para associar Carteira com Ativo (codigo_ativo)
+ALTER TABLE Carteira ADD CONSTRAINT fk_carteira_ativo FOREIGN KEY (codigo_ativo) REFERENCES Ativo(codigo_ativo) ON DELETE CASCADE;
 
 -- Tabela HistoricoPrecoAtivo (associação Many-to-One com Ativo)
 CREATE TABLE HistoricoPrecoAtivo (
-                                     codigo_ativo VARCHAR(10),                  -- Chave estrangeira para Ativo
-                                     data_preco TIMESTAMP,                      -- Data do preço (parte da chave primária)
-                                     valor_ativo DECIMAL(18, 5) NOT NULL,       -- Valor do ativo na data
-                                     PRIMARY KEY (codigo_ativo, data_preco)     -- Chave primária composta
+                                     codigo_ativo VARCHAR2(10),
+                                     data_preco TIMESTAMP,
+                                     valor_ativo NUMBER(18, 5) NOT NULL,
+                                     PRIMARY KEY (codigo_ativo, data_preco)
 );
 
--- Constraints da tabela HistoricoPrecoAtivo
-ALTER TABLE HistoricoPrecoAtivo
-    ADD CONSTRAINT fk_historico_ativo
-        FOREIGN KEY (codigo_ativo) REFERENCES Ativo(codigo_ativo) ON DELETE CASCADE;
+-- Constraint Foreign Key para associar HistoricoPrecoAtivo com Ativo (codigo_ativo)
+ALTER TABLE HistoricoPrecoAtivo ADD CONSTRAINT fk_historico_ativo FOREIGN KEY (codigo_ativo) REFERENCES Ativo(codigo_ativo) ON DELETE CASCADE;
 
 -- Tabela Transacao
 CREATE TABLE Transacao (
-                           tipo VARCHAR(6) CHECK (tipo IN ('COMPRA', 'VENDA')),  -- Tipo da transação
-                           valor DECIMAL(18, 2) NOT NULL,                       -- Valor da transação
-                           data TIMESTAMP,                                      -- Data da transação (parte da chave primária)
-                           cpf VARCHAR(11),                                     -- Chave estrangeira para Conta (parte da chave primária)
-                           codigo_ativo VARCHAR(10),                            -- Chave estrangeira para Ativo (parte da chave primária)
-                           PRIMARY KEY (cpf, codigo_ativo, data)               -- Chave primária composta
+                           tipo VARCHAR2(6) CHECK (tipo IN ('COMPRA', 'VENDA')),
+                           valor NUMBER(18, 2) NOT NULL,
+                           data TIMESTAMP,
+                           cpf VARCHAR2(11),
+                           codigo_ativo VARCHAR2(10),
+                           PRIMARY KEY (cpf, codigo_ativo, data)
 );
 
--- Constraints da tabela Transacao
-ALTER TABLE Transacao
-    ADD CONSTRAINT fk_transacao_conta
-        FOREIGN KEY (cpf) REFERENCES Conta(cpf) ON DELETE CASCADE;
+-- Constraint Foreign Key para associar Transacao com Conta (cpf)
+ALTER TABLE Transacao ADD CONSTRAINT fk_transacao_conta FOREIGN KEY (cpf) REFERENCES Conta(cpf) ON DELETE CASCADE;
 
-ALTER TABLE Transacao
-    ADD CONSTRAINT fk_transacao_ativo
-        FOREIGN KEY (codigo_ativo) REFERENCES Ativo(codigo_ativo) ON DELETE CASCADE;
+-- Constraint Foreign Key para associar Transacao com Ativo (codigo_ativo)
+ALTER TABLE Transacao ADD CONSTRAINT fk_transacao_ativo FOREIGN KEY (codigo_ativo) REFERENCES Ativo(codigo_ativo) ON DELETE CASCADE;
