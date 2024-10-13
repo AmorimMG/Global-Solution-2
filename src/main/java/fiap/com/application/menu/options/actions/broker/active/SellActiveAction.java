@@ -2,6 +2,7 @@ package fiap.com.application.menu.options.actions.broker.active;
 
 import fiap.com.application.ServiceContext;
 import fiap.com.application.menu.options.actions.AbstractAction;
+import fiap.com.application.menu.options.actions.broker.account.ViewWalletAction;
 import fiap.com.exception.UnauthorizedException;
 import fiap.com.model.Ativo;
 import fiap.com.model.Carteira;
@@ -23,7 +24,9 @@ public class SellActiveAction extends AbstractAction {
         Optional<BigDecimal> opt = carteira.getAtivo(ativo);
 
         if (opt.isEmpty()) {
-            System.out.println("Você não possui moedas desse ativo!");
+            System.out.println("Você não possui moedas desse ativo! Os ativos que você possui são:");
+            AbstractAction action = new ViewWalletAction();
+            action.execute();
             return;
         } else {
             BigDecimal quantidade = opt.get();
