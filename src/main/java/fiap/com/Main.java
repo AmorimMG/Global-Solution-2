@@ -51,8 +51,8 @@ public class Main {
 
         contaService.cadastrar(
                 "12345678910",
-                "Tio Patinhas",
-                "tio@patinhas.com.br",
+                "Global Solution",
+                "gloabal@solution.com.br",
                 DateUtil.dateFromString("25/12/1947"),
                 "user",
                 "pass"
